@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "461552008968",
+    "firebase_url": "https://psychology-5d692.firebaseio.com",
+    "project_id": "psychology-5d692",
+    "storage_bucket": "psychology-5d692.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:461552008968:android:09e70171db821d21",
+        "android_client_info": {
+          "package_name": "com.firrael.psychology"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "461552008968-vg18f2rv0da0msl1o2d1r02v8i408cbl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvDG8fvkT5CeuZQbm1XohHHHy-APEArSM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

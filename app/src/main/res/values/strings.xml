@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Accelerometer</string>
+
+    <!-- Strings related to login -->
+
+    <string name="accelerometerTestTitle">Акселерометр</string>
+
+    <string name="bluetooth">Bluetooth</string>
+
+    <string name="exit">Выйти</string>
+</resources>
