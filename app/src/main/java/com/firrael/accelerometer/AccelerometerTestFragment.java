@@ -33,8 +33,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -70,6 +71,7 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
 
     private AcceptThread acceptThread;
     private ConnectedThread connectedThread;
+    private ConnectedThread connectedThread2;
 
     private ValueAnimator yAnimator;
     private ValueAnimator xAnimator;
@@ -128,6 +130,9 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         getActivity().registerReceiver(receiver, filter);
 
+        nf = NumberFormat.getInstance(Locale.US);
+        nf.setMaximumFractionDigits(2);
+
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -184,7 +189,7 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
         //    startLoading();
 
         ArrayList<Double> xTmp = new ArrayList<>(x), yTmp = new ArrayList<>(y);
-    //    getPresenter().save(xTmp, yTmp);
+        //    getPresenter().save(xTmp, yTmp);
 
         // write to bluetooth
         writeToBluetooth(xTmp);
@@ -208,6 +213,23 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
 
                 byte[] bytes = baos.toByteArray();
                 connectedThread.write(bytes);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (connectedThread2 != null) { // if bluetooth socket is active
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                DataOutputStream out = new DataOutputStream(baos);
+                for (Double element : tmp) {
+                    out.writeDouble(element);
+                    Log.i(TAG, String.valueOf(element));
+                }
+
+                byte[] bytes = baos.toByteArray();
+                connectedThread2.write(bytes);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -268,7 +290,8 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
         }
     }
 
-    private DecimalFormat df = new DecimalFormat("#.00");
+    //private DecimalFormat df = new DecimalFormat("#.00");
+    private NumberFormat nf;
 
     private void update(double x, double y) {
         if (counter >= PACKAGE_SIZE) {
@@ -333,8 +356,8 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
 
             upload();
         } else {
-            this.x.add(Double.valueOf(df.format(x)));
-            this.y.add(Double.valueOf(df.format(y)));
+            this.x.add(Double.valueOf(nf.format(x)));
+            this.y.add(Double.valueOf(nf.format(y)));
             counter++;
         }
     }
@@ -416,7 +439,16 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
             accelerometerCircle.setVisibility(View.VISIBLE);
         });
 
-        connectedThread = new ConnectedThread(socket);
+        if (connectedThread == null) {
+            connectedThread = new ConnectedThread(socket);
+        } else {
+            connectedThread2 = new ConnectedThread(socket);
+        }
+
+        if (connectedThread2 == null) {
+            acceptThread = new AcceptThread();
+            acceptThread.start();
+        }
     }
 
 
@@ -515,6 +547,10 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
 
         if (connectedThread != null) {
             connectedThread.cancel();
+        }
+
+        if (connectedThread2 != null) {
+            connectedThread2.cancel();
         }
 
         connected = false;
