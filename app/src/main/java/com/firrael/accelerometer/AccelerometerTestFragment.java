@@ -57,6 +57,8 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
 
     private Handler handler;
 
+    private ConnectionState connectionState = ConnectionState.NO_CONNECTIONS;
+
     private int counter = 0;
     private ArrayList<Double> x = new ArrayList<>(), y = new ArrayList<>();
 
@@ -439,15 +441,22 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
             accelerometerCircle.setVisibility(View.VISIBLE);
         });
 
-        if (connectedThread == null) {
+        if (connectionState.equals(ConnectionState.NO_CONNECTIONS)) {
             connectedThread = new ConnectedThread(socket);
-        } else {
+            connectionState = ConnectionState.FIRST_CONNECTION;
+        } else if (connectionState.equals(ConnectionState.FIRST_CONNECTION)) {
             connectedThread2 = new ConnectedThread(socket);
+            connectionState = ConnectionState.TWO_CONNECTIONS;
+        } else if (connectionState.equals(ConnectionState.SECOND_CONNECTION)) {
+            connectedThread = new ConnectedThread(socket);
+            connectionState = ConnectionState.TWO_CONNECTIONS;
         }
 
-        if (connectedThread2 == null) {
-            acceptThread = new AcceptThread();
-            acceptThread.start();
+        if (!connectionState.equals(ConnectionState.TWO_CONNECTIONS)) {
+            if (connectedThread == null || connectedThread2 == null) {
+                acceptThread = new AcceptThread();
+                acceptThread.start();
+            }
         }
     }
 
@@ -560,5 +569,9 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
         }
 
         Log.i(TAG, "Bluetooth connection stopped");
+
+        connectionState = ConnectionState.NO_CONNECTIONS;
+
+        initBluetooth();
     }
 }
