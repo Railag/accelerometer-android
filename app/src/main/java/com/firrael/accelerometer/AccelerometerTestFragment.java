@@ -564,14 +564,19 @@ public class AccelerometerTestFragment extends BaseFragment<AccelerometerTestPre
 
         connected = false;
 
-        if (accelerometerCircle != null) {
-            accelerometerCircle.setVisibility(View.GONE);
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                if (accelerometerCircle != null) {
+                    accelerometerCircle.setVisibility(View.GONE);
+                }
+
+                connectionState = ConnectionState.NO_CONNECTIONS;
+
+                initBluetooth();
+            });
         }
 
         Log.i(TAG, "Bluetooth connection stopped");
 
-        connectionState = ConnectionState.NO_CONNECTIONS;
-
-        initBluetooth();
     }
 }
